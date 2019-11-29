@@ -1,17 +1,17 @@
 package com.mutistic.demo.file.excel;
 
 import com.mutistic.demo.file.constants.FileTypeEnum;
+import com.mutistic.demo.file.utils.ExcelUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 读取 Excel 抽象类
@@ -19,26 +19,30 @@ import org.springframework.web.multipart.MultipartFile;
  * @author yinyc
  * @version 1.0 2019/11/27
  */
+@Slf4j
 public abstract class AbstractReadExcel {
 
   /**
    * Workbook
    */
-  public Workbook workbook;
+  private Workbook workbook;
   /**
    * 输入流
    */
-  public InputStream inputStream;
+  private InputStream inputStream;
 
-  /**
-   * 获取实例
-   *
-   * @param multipartFile multipartFile
-   * @return AbstractExcelRead 实例
-   * @throws IOException IOException
-   */
-  public abstract AbstractReadExcel getInstance(MultipartFile multipartFile, FileTypeEnum fileType)
-      throws IOException;
+  public Workbook getWorkbook() {
+    return workbook;
+  }
+
+  public InputStream getInputStream() {
+    return inputStream;
+  }
+
+  public AbstractReadExcel(InputStream inputStream, FileTypeEnum fileType) throws IOException {
+    this.inputStream = inputStream;
+    initWorkbook(fileType);
+  }
 
   /**
    * 初始化 Workbook
@@ -57,44 +61,48 @@ public abstract class AbstractReadExcel {
   /**
    * 读取Excel
    *
-   * @param multipartFile 文件
-   * @param clazz         类
-   * @param <T>           类类型
+   * @param <T>   类类型
+   * @param clazz 类
    * @return 读取结果
    */
-  public abstract <T> List<T> read(MultipartFile multipartFile, Class<T> clazz);
+  public abstract <T> List<T> read(Class<T> clazz);
 
   /**
-   * 并行读取Excel
+   * 获取表头集合
    *
-   * @param multipartFile 文件
-   * @param clazz         类
-   * @param <T>           类类型
-   * @return 读取结果
+   * @param sheet 页签
+   * @return 表头集合
    */
-  public abstract <T> List<T> parallelRead(MultipartFile multipartFile, Class<T> clazz);
-
-  public List<String> getHeadList(Sheet sheet) {
+  public List<String> readHead(Sheet sheet) {
+    log.info("sheet.getLastRowNum()={}", sheet.getLastRowNum());
     if (sheet.getLastRowNum() == 0) {
       return null;
     }
     Row head = sheet.getRow(0);
-    if (head.getLastCellNum() == 0) {
+    if (head == null) {
       return null;
     }
-    List<String> headList = new ArrayList<>();
-    Cell cell;
-    for (int i = 0; i < head.getLastCellNum(); i++) {
-      cell = head.getCell(i);
-      if (cell == null) {
-        headList.add("null-" + i);
-        continue;
-      }
-      headList.add(cell.getStringCellValue());
+    int cellNum = head.getLastCellNum();
+    log.info("row.getLastCellNum()={}", cellNum);
+    if (cellNum == 0) {
+      return null;
     }
-
+    List<String> headList = new ArrayList<>(cellNum);
+    for (int i = 0; i < cellNum; i++) {
+      Object cellValue = ExcelUtil.getCellValue(head.getCell(i));
+      if (!(cellValue instanceof String)) {
+        headList.add("null-" + i);
+      } else {
+        headList.add((String) cellValue);
+      }
+    }
     return headList;
   }
+
+  public abstract <T> List<T> readRow(Sheet sheet, Class<T> clazz);
+
+  public abstract <T> T readCell(Row row, Class<T> clazz)
+      throws IllegalAccessException, InstantiationException;
 
   /**
    * 关闭资源
