@@ -108,6 +108,7 @@ public class ReadExcel extends AbstractReadExcel {
         if (value == null) {
           continue;
         }
+        log.info("{}{}", field.getName(), field.isAccessible());
         try {
           field.set(data, ExcelUtil.stringToType(value, field.getType()));
         } catch (IllegalAccessException e) {

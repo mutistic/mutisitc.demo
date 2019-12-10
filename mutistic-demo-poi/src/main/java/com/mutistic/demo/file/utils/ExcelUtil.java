@@ -198,7 +198,7 @@ public class ExcelUtil {
       return StringUtils.trimToEmpty(cell.getStringCellValue());
     } else if (cell.getCellType() == CellType.NUMERIC) {
       if (DateUtil.isCellDateFormatted(cell)) {
-        return HSSFDateUtil.getJavaDate(cell.getNumericCellValue()).toString();
+        return cell.getDateCellValue().toString();// HSSFDateUtil.getJavaDate(cell.getNumericCellValue()).toString();
       } else {
         return new BigDecimal(cell.getNumericCellValue()).toString();
       }

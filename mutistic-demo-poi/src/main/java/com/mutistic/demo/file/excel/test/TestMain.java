@@ -19,9 +19,9 @@ public class TestMain {
         .replace("file:/", "")
         .replace("target/classes", "src/main/java");
 
-    read(path, "empty.xlsx");
+//    read(path, "empty.xlsx");
     read(path, "test-annontation.xlsx");
-    read(path, "test-name.xlsx");
+//    read(path, "test-name.xlsx");
   }
 
   private static void read(String path, String fileName) {
