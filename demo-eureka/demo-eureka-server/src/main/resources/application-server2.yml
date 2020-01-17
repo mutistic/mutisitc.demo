@@ -1,0 +1,15 @@
+server:
+  port: 8762
+
+eureka:
+  instance:
+    hostname: server2.com
+    instance-id: server2
+  client:
+    fetch-registry: true #是否检索服务：默认true-检索
+    register-with-eureka: true #表示向Eureka注册自身服务：默认true-注册自身
+    service-url:
+      # defaultZone 默认
+#      defaultZone: http://server1.com:8761/eureka,http://server3.com:8763/eureka
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@server1.com:8761/eureka,http://${spring.security.user.name}:${spring.security.user.password}@server3.com:8763/eureka
+#      defaultZone: http://peer1:8761${server.servlet.context-path}/eureka

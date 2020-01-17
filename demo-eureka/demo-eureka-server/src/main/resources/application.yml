@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: demo-eureka-server
+  # 安全验证服务
+  security:
+    user:
+      name: eureka
+      password: admin123
+#      roles:
+logging:
+  level.root: debug

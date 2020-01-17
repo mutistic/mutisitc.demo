@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: demo-eureka-server
+
+logging:
+  level.root: debug
+
+# Eureka单服务配置
+server:
+  port: 9080
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    hostname: localhost
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/${server.servlet.context-path}

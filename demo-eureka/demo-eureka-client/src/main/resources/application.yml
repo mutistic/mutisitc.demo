@@ -1,0 +1,21 @@
+server:
+  port: 9080
+
+spring:
+  application:
+    name: demo-eureka-client
+
+logging:
+  level.root: debug
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: 192.168.0.164
+    # eureka服务注册名：实际ip地址:项目名:端口号
+    instance-id: ${eureka.instance.ip-address}:${spring.application.name}:${server.port}
+  client:
+    fetch-registry: false
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://eureka:admin123@server1.com:8761/eureka
